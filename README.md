@@ -18,8 +18,8 @@ This project uses [`renv`](https://rstudio.github.io/renv/) to manage its packag
 1.  **Clone the Git repository:** e.g.,
 
 ``` bash
-git clone https://github.com/alinakumukova/[your-repo].git
-cd [your-repo]
+git clone https://github.com/alinakumukova/time-to-event.git
+cd time-to-event
 ```
 
 2.  **Open the project** by double-clicking [time-to-event.Rproj] in RStudio. 'renv' will bootstrap automatically the first time.
