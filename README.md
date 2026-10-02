@@ -32,25 +32,18 @@ renv::restore()
 
 This will install all required packages (with dependencies) at the recorded versions. (This step might take a few minutes the first time)
 
-4.  **Run the analysis.** Details to be added.
+4.  **Run the analysis.** 
 
-## Key packages required to run the code
+## Key required packages
 
 - renv
 - tidyverse
-- rmarkdown
-- knitr
-- LtAtStructuR
 - ltmle
-- tmle
-- tmle3
 - sl3
 - SuperLearner
 - survival
-- survminer
-- ggplot2
-- gtsummary
+- knitr and bookdown (for compilation, not necessary for running code)
 
 ## Contact
 
-Alina Kumukova - [casfaber.ak\@gmail.com](mailto:casfaber.ak@gmail.com){.email}
+Alina Kumukova - [alina.kumukova\@ed.ac.uk](mailto:alina.kumukova@ed.ac.uk){.email}
