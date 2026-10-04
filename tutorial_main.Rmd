@@ -277,11 +277,12 @@ Causal quantities of interest include:
 
 All of these are collapsible.
 
-In this tutorial we use the **risk ratio**. Equivalently, the outcome
-can be written as an event indicator $Y(t) = \mathbb{I}\{T \le t\}$,
-with counterfactual $Y^d(t) = \mathbb{I}\{T^d \le t\}$ and
-counterfactual risk $\mathbb{E}\{Y^d(t)\} = \mathbb{P}\{Y^d(t) = 1\}$.
-We use this formulation from now on.
+In this tutorial we use the **risk ratio**. Note, that the outcome of
+interest can be equivalently written as an event indicator
+$Y(t) = \mathbb{I}\{T \le t\}$, with counterfactual
+$Y^d(t) = \mathbb{I}\{T^d \le t\}$ and counterfactual risk
+$\mathbb{E}\{Y^d(t)\} = \mathbb{P}\{Y^d(t) = 1\}$. We use this
+formulation from now on.
 
 # Estimating the risk ratio with Targeted Learning {#estimation}
 
@@ -289,14 +290,13 @@ We use this formulation from now on.
 
 We consider $K$ time points $t = 1, \dots, K$. At each time point:
 
-- the treatment $A_t$ is assigned at baseline ($A_0$) and reassessed at
-  later time points;
+- the treatment $A_t$, assigned at baseline ($A_0$), is reassessed;
 - the event indicator $Y_t = 1$ if the event has occurred at or before
   $t$, and $0$ otherwise. Once $Y_t = 1$, $Y_{t'} = 1$ for all $t' > t$
   (**monotonicity**: once an event has happened, it has happened);
 - there is no censoring: everyone is followed until $K$;
-- covariates/confounders $L_t$ are measured at time $t$ and can be
-  discrete or continuous.
+- covariates/confounders $L_t$ are measured, can be discrete or
+  continuous.
 
 > **Simplification in the running example.** To keep the hand
 > calculations short, the example has $K = 2$ and the outcome is
@@ -315,7 +315,7 @@ knitr::include_graphics("DAG_main.jpeg")
 
 We target the risk ratio at $t = 2$ between two regimes of **sustained**
 use, $d_1 = \{A_0 = 1, A_1 = 1\}$ and $d_2 = \{A_0 = 0, A_1 = 0\}$:
-$$RR_2 = \frac{1 - S^{d_1}(2)}{1 - S^{d_2}(2)} = \frac{\mathbb{E}\{Y^{d_1}(2)\}}{\mathbb{E}\{Y^{d_2}(2)\}}.$$
+$$\psi = \frac{1 - S^{d_1}(2)}{1 - S^{d_2}(2)} = \frac{\mathbb{E}\{Y^{d_1}(2)\}}{\mathbb{E}\{Y^{d_2}(2)\}}.$$
 
 ## Identification
 
@@ -707,9 +707,10 @@ $\tilde Y_1 = Y_1 + (1 - Y_1)\bar Q_2^{d*}$; see the Appendix.)
 > numerically 0, something is wrong, most often an untargeted $\bar Q$
 > in the formula.
 
-For contrasts between regimes, **subtract the ICs first, then take the
-variance**. The two estimates use the same people, so they are
-correlated. Adding their variances gives intervals that are too wide.
+For contrasts between regimes, subtract the ICs first, then take the
+variance. The two estimates use data on the same individuals, so they
+are correlated. Adding their variances gives intervals that are too
+wide.
 
 | Contrast                           | Influence curve                      |
 |-----------------------------------|-------------------------------------|
@@ -797,8 +798,9 @@ Learner (Part III).
 > **Two settings to match the hand calculation.**
 > `variance.method = "ic"` uses the plain influence-curve variance from
 > Section \@ref(ic). The default, `"tmle"`, is more conservative under
-> near-positivity violations. `estimate.time = FALSE` skips a timing
-> pre-run.
+> near-positivity violations. The default, `stratify = FALSE`, fits
+> regressions on all individuals rather than only on those who followed
+> the regime. `estimate.time = FALSE` skips a timing pre-run.
 
 ```{r ltmle}
 fit <- ltmle(ObsData[, c("L01","L02","A0","L11","L12","A1","Y2")],
@@ -877,7 +879,6 @@ applied
 tutorial](https://ehsanx.github.io/EpiMethods/machinelearningCausal2.html).
 
 ```{r ltmle-SL, cache=TRUE}
-## requires: install.packages(c("SuperLearner", "MASS"))
 library(SuperLearner)
 fit.SL <- ltmle(ObsData[, c("L01","L02","A0","L11","L12","A1","Y2")],
                 Anodes = c("A0","A1"),
@@ -896,8 +897,9 @@ summary(fit.SL)
 a.  Inspect `fit.SL$fit$Q` and `fit.SL$fit$g`. Which learners get the
     most weight? Is that what you expect given the data-generating
     model?
-b.  Add a non-linear learner (e.g. `"SL.earth"` or `"SL.ranger"`). Does
-    the estimate change? Does the runtime? (Reduce `n` if it is slow.)
+b.  Add a non-linear learner (e.g. `"SL.earth"` or `"SL.ranger"`, this
+    will require installing the corresponding packages). Does the
+    estimate change? Does the runtime? (Reduce `n` if it is slow.)
 c.  **Double robustness with Super Learner.** Give $Q$ a deliberately
     useless library (`"SL.mean"` only) but keep $g$ good. Then do the
     reverse. Compare both with the truth.
@@ -1244,11 +1246,12 @@ attr(diabetic_ltmle, "nodes")
 These materials were drafted with the help of generative AI and verified
 and corrected by the author.
 
-### Licence {-}
+### Licence {.unnumbered}
 
-© 2026 Alina Kumukova. This tutorial and its code are licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). You may share and
-adapt the material for any purpose, provided you give appropriate credit.
+© 2026 Alina Kumukova. This tutorial and its code are licensed under [CC
+BY 4.0](https://creativecommons.org/licenses/by/4.0/). You may share and
+adapt the material for any purpose, provided you give appropriate
+credit.
 
 # Appendix — Estimating ${\small \mathbb{E}[Y^d(t)]}$ at a fixed $\small t$, with censoring {#appendix}
 

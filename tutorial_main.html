@@ -11,7 +11,7 @@
 
 <meta name="author" content="Alina Kumukova" />
 
-<meta name="date" content="2026-10-02" />
+<meta name="date" content="2026-10-04" />
 
 <title>Targeted learning for treatment effect estimation on time-to-event outcomes</title>
 
@@ -1584,7 +1584,7 @@ font-size: 0.95em;
 
 <h1 class="title toc-ignore">Targeted learning for treatment effect estimation on time-to-event outcomes</h1>
 <h4 class="author">Alina Kumukova</h4>
-<h4 class="date">2026-10-02</h4>
+<h4 class="date">2026-10-04</h4>
 
 </div>
 
@@ -1854,11 +1854,12 @@ time-varying) covariates/confounders.</p>
 </ul></li>
 </ul>
 <p>All of these are collapsible.</p>
-<p>In this tutorial we use the <strong>risk ratio</strong>. Equivalently, the outcome
-can be written as an event indicator <span class="math inline">\(Y(t) = \mathbb{I}\{T \le t\}\)</span>,
-with counterfactual <span class="math inline">\(Y^d(t) = \mathbb{I}\{T^d \le t\}\)</span> and
-counterfactual risk <span class="math inline">\(\mathbb{E}\{Y^d(t)\} = \mathbb{P}\{Y^d(t) = 1\}\)</span>.
-We use this formulation from now on.</p>
+<p>In this tutorial we use the <strong>risk ratio</strong>. Note, that the outcome of
+interest can be equivalently written as an event indicator
+<span class="math inline">\(Y(t) = \mathbb{I}\{T \le t\}\)</span>, with counterfactual
+<span class="math inline">\(Y^d(t) = \mathbb{I}\{T^d \le t\}\)</span> and counterfactual risk
+<span class="math inline">\(\mathbb{E}\{Y^d(t)\} = \mathbb{P}\{Y^d(t) = 1\}\)</span>. We use this
+formulation from now on.</p>
 </div>
 </div>
 <div id="estimation" class="section level1" number="2">
@@ -1867,14 +1868,13 @@ We use this formulation from now on.</p>
 <h2><span class="header-section-number">2.1</span> Causal model</h2>
 <p>We consider <span class="math inline">\(K\)</span> time points <span class="math inline">\(t = 1, \dots, K\)</span>. At each time point:</p>
 <ul>
-<li>the treatment <span class="math inline">\(A_t\)</span> is assigned at baseline (<span class="math inline">\(A_0\)</span>) and reassessed at
-later time points;</li>
+<li>the treatment <span class="math inline">\(A_t\)</span>, assigned at baseline (<span class="math inline">\(A_0\)</span>), is reassessed;</li>
 <li>the event indicator <span class="math inline">\(Y_t = 1\)</span> if the event has occurred at or before
 <span class="math inline">\(t\)</span>, and <span class="math inline">\(0\)</span> otherwise. Once <span class="math inline">\(Y_t = 1\)</span>, <span class="math inline">\(Y_{t&#39;} = 1\)</span> for all <span class="math inline">\(t&#39; &gt; t\)</span>
 (<strong>monotonicity</strong>: once an event has happened, it has happened);</li>
 <li>there is no censoring: everyone is followed until <span class="math inline">\(K\)</span>;</li>
-<li>covariates/confounders <span class="math inline">\(L_t\)</span> are measured at time <span class="math inline">\(t\)</span> and can be
-discrete or continuous.</li>
+<li>covariates/confounders <span class="math inline">\(L_t\)</span> are measured, can be discrete or
+continuous.</li>
 </ul>
 <blockquote>
 <p><strong>Simplification in the running example.</strong> To keep the hand
@@ -1896,7 +1896,7 @@ Figure 2.1: DAG describing the assumed causal structure of the data.
 <h2><span class="header-section-number">2.2</span> The target parameter</h2>
 <p>We target the risk ratio at <span class="math inline">\(t = 2\)</span> between two regimes of <strong>sustained</strong>
 use, <span class="math inline">\(d_1 = \{A_0 = 1, A_1 = 1\}\)</span> and <span class="math inline">\(d_2 = \{A_0 = 0, A_1 = 0\}\)</span>:
-<span class="math display">\[RR_2 = \frac{1 - S^{d_1}(2)}{1 - S^{d_2}(2)} = \frac{\mathbb{E}\{Y^{d_1}(2)\}}{\mathbb{E}\{Y^{d_2}(2)\}}.\]</span></p>
+<span class="math display">\[\psi = \frac{1 - S^{d_1}(2)}{1 - S^{d_2}(2)} = \frac{\mathbb{E}\{Y^{d_1}(2)\}}{\mathbb{E}\{Y^{d_2}(2)\}}.\]</span></p>
 </div>
 <div id="identification" class="section level2" number="2.3">
 <h2><span class="header-section-number">2.3</span> Identification</h2>
@@ -2302,9 +2302,10 @@ averages to <strong>exactly zero</strong> in the sample. If <code>mean(IC)</code
 numerically 0, something is wrong, most often an untargeted <span class="math inline">\(\bar Q\)</span>
 in the formula.</p>
 </blockquote>
-<p>For contrasts between regimes, <strong>subtract the ICs first, then take the
-variance</strong>. The two estimates use the same people, so they are
-correlated. Adding their variances gives intervals that are too wide.</p>
+<p>For contrasts between regimes, subtract the ICs first, then take the
+variance. The two estimates use data on the same individuals, so they
+are correlated. Adding their variances gives intervals that are too
+wide.</p>
 <table>
 <colgroup>
 <col width="48%" />
@@ -2419,8 +2420,9 @@ Learner (Part III).</p>
 <p><strong>Two settings to match the hand calculation.</strong>
 <code>variance.method = &quot;ic&quot;</code> uses the plain influence-curve variance from
 Section <a href="#ic">3.6</a>. The default, <code>&quot;tmle&quot;</code>, is more conservative under
-near-positivity violations. <code>estimate.time = FALSE</code> skips a timing
-pre-run.</p>
+near-positivity violations. The default, <code>stratify = FALSE</code>, fits
+regressions on all individuals rather than only on those who followed
+the regime. <code>estimate.time = FALSE</code> skips a timing pre-run.</p>
 </blockquote>
 <pre class="r"><code>fit &lt;- ltmle(ObsData[, c(&quot;L01&quot;,&quot;L02&quot;,&quot;A0&quot;,&quot;L11&quot;,&quot;L12&quot;,&quot;A1&quot;,&quot;Y2&quot;)],
              Anodes = c(&quot;A0&quot;,&quot;A1&quot;),
@@ -2537,8 +2539,7 @@ interactions.</p>
 handbook</a> and <a href="https://ehsanx.github.io/EpiMethods/machinelearningCausal2.html">this
 applied
 tutorial</a>.</p>
-<pre class="r"><code>## requires: install.packages(c(&quot;SuperLearner&quot;, &quot;MASS&quot;))
-library(SuperLearner)
+<pre class="r"><code>library(SuperLearner)
 fit.SL &lt;- ltmle(ObsData[, c(&quot;L01&quot;,&quot;L02&quot;,&quot;A0&quot;,&quot;L11&quot;,&quot;L12&quot;,&quot;A1&quot;,&quot;Y2&quot;)],
                 Anodes = c(&quot;A0&quot;,&quot;A1&quot;),
                 Lnodes = c(&quot;L11&quot;,&quot;L12&quot;),
@@ -2591,8 +2592,9 @@ summary(fit.SL)
 <li>Inspect <code>fit.SL$fit$Q</code> and <code>fit.SL$fit$g</code>. Which learners get the
 most weight? Is that what you expect given the data-generating
 model?</li>
-<li>Add a non-linear learner (e.g. <code>&quot;SL.earth&quot;</code> or <code>&quot;SL.ranger&quot;</code>). Does
-the estimate change? Does the runtime? (Reduce <code>n</code> if it is slow.)</li>
+<li>Add a non-linear learner (e.g. <code>&quot;SL.earth&quot;</code> or <code>&quot;SL.ranger&quot;</code>, this
+will require installing the corresponding packages). Does the
+estimate change? Does the runtime? (Reduce <code>n</code> if it is slow.)</li>
 <li><strong>Double robustness with Super Learner.</strong> Give <span class="math inline">\(Q\)</span> a deliberately
 useless library (<code>&quot;SL.mean&quot;</code> only) but keep <span class="math inline">\(g\)</span> good. Then do the
 reverse. Compare both with the truth.</li>
@@ -2962,9 +2964,10 @@ and corrected by the author.</p>
 </div>
 <div id="licence" class="section level3 unnumbered">
 <h3>Licence</h3>
-<p>© 2026 Alina Kumukova. This tutorial and its code are licensed under
-<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. You may share and
-adapt the material for any purpose, provided you give appropriate credit.</p>
+<p>© 2026 Alina Kumukova. This tutorial and its code are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC
+BY 4.0</a>. You may share and
+adapt the material for any purpose, provided you give appropriate
+credit.</p>
 </div>
 </div>
 <div id="appendix" class="section level1" number="9">
